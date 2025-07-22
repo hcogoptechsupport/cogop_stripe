@@ -1,22 +1,30 @@
+# .github/workflows/ping-edge-function.yml
 name: Keep Supabase Edge Function Alive
 
 on:
   schedule:
     - cron: '0 9 */2 * *'  # Every 2 days at 9:00 AM UTC
-  workflow_dispatch:
+  workflow_dispatch:       # Optional manual trigger
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping create-checkout function
+      - name: Verbose Ping to create-checkout function
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          RESPONSE=$(curl --fail --silent -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
+          echo "Starting keepalive ping at $(date -u)"
+          RESPONSE=$(curl --silent --show-error -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            -d '{"item": "ping", "amount": 0.01}')
+            -d "{\"item\":\"ping\",\"amount\":0.01}")
           echo "Ping response: $RESPONSE"
+
+          # Optional: fail workflow if response isn’t what we expect
+          if [[ "$RESPONSE" != *"\"status\":\"awake\""* ]]; then
+            echo "Unexpected response received — failing job"
+            exit 1
+          fi
 
