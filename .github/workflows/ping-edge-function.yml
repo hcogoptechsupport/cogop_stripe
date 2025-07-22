@@ -3,7 +3,8 @@ permissions: read-all
 
 on:
   schedule:
-    - cron: '30 2 * * *'
+    - cron: '*/6 * * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
