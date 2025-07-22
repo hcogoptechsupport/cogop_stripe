@@ -19,7 +19,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            --data-raw '{"item":"ping","amount":0.01}')
+            --data '{"item":"ping","amount":0.01}')
           echo "✅ Ping response: $RESPONSE"
           if [[ "$RESPONSE" != *"\"status\":\"awake\""* ]]; then
             echo "❌ Unexpected response received — failing job"
