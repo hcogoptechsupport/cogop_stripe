@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping create-checkout function
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           RESPONSE=$(curl --fail --silent -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
