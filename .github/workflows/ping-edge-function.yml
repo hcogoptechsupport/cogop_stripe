@@ -1,10 +1,9 @@
-# .github/workflows/ping-edge-function.yml
 name: Keep Supabase Edge Function Alive
 
 on:
   schedule:
     - cron: '0 9 */2 * *'  # Every 2 days at 9:00 AM UTC
-  workflow_dispatch:       # Optional manual trigger
+  workflow_dispatch:
 
 jobs:
   ping:
