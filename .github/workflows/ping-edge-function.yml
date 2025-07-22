@@ -12,7 +12,9 @@ jobs:
     steps:
       - name: Ping create-checkout function
         run: |
-          curl -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout
+          RESPONSE=$(curl --fail --silent -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
-            -d '{"item": "ping", "amount": 0.01}'
+            -d '{"item": "ping", "amount": 0.01}')
+          echo "Ping response: $RESPONSE"
+
