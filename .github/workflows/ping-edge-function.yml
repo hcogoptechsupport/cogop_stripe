@@ -10,14 +10,28 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Clean Ping to create-checkout function via inline JSON
+      - name: Ping Supabase Edge Function via payload file
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-         printf '{"item":"ping","amount":0.01}' | \
-         curl -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
+          echo "🟡 Starting keepalive ping at $(date -u)"
+          
+          # Write the payload exactly (no stray newline or escapes)
+          printf '{"item":"ping","amount":0.01}' > ping-body.json
+          
+          # DEBUG: Show in logs exactly what we're sending
+          echo "📦 Payload:"
+          cat ping-body.json
+          
+          # Curl with file-based JSON
+          RESPONSE=$(curl --silent --show-error -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            -d @-
-    
+            -d @ping-body.json)
+          
+          echo "✅ Ping response: $RESPONSE"
+          if [[ "$RESPONSE" != *"\"status\":\"awake\""* ]]; then
+            echo "❌ Unexpected response — failing job"
+            exit 1
+          fi
