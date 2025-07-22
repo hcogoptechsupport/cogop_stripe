@@ -10,21 +10,17 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Clean Ping to create-checkout function via stdin
+            - name: Clean Ping to create-checkout function via inline JSON
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           echo "🟡 Starting keepalive ping at $(date -u)"
-
-          RESPONSE=$(printf '{"item":"ping","amount":0.01}' | \
-            curl --silent --show-error -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
-              -H "Content-Type: application/json" \
-              -H "Origin: https://www.huddlestoncogop.org" \
-              -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-              --data @-)
-
+          RESPONSE=$(curl --silent --show-error -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
+            -H "Content-Type: application/json" \
+            -H "Origin: https://www.huddlestoncogop.org" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            --data-raw '{"item":"ping","amount":0.01}')
           echo "✅ Ping response: $RESPONSE"
-
           if [[ "$RESPONSE" != *"\"status\":\"awake\""* ]]; then
             echo "❌ Unexpected response received — failing job"
             exit 1
