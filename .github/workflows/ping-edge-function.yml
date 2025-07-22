@@ -2,8 +2,7 @@ name: Keep Supabase Edge Function Alive
 
 on:
   schedule:
-    - cron: '18 16 * * *'  # covers EDT months
-    - cron: '18 17 * * *'  # covers EST months
+    - cron: '* * * * *'  
   workflow_dispatch:
 
 jobs:
