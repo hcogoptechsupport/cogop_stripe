@@ -14,7 +14,7 @@ jobs:
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-         echo '{"item":"ping","amount":0.01}' | \
+         printf '{"item":"ping","amount":0.01}' | \
          curl -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
