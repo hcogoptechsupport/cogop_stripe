@@ -15,7 +15,7 @@ jobs:
           RESPONSE=$(curl --fail --silent -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
-            -H "Authorization: Bearer Bearer $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
             -d '{"item": "ping", "amount": 0.01}')
           echo "Ping response: $RESPONSE"
 
