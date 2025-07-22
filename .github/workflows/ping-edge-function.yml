@@ -1,46 +1,31 @@
-# .github/workflows/ping-edge-function.yml
 name: Keep Supabase Edge Function Alive
 
 on:
   schedule:
     - cron: '0 9 */2 * *'  # Every 2 days at 9:00 AM UTC
-  workflow_dispatch:       # Manual trigger from Actions tab
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase Edge Function via payload file
+      - name: Ping Supabase Edge Function
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          echo "🟡 Starting keepalive ping at $(date -u)"
-          
-          # 1) Write the exact JSON payload (no trailing newline)
+          # Create payload file with no trailing newline
           printf '{"item":"ping","amount":0.01}' > ping-body.json
-          
-          # 2) DEBUG: show payload bytes & length
-          echo "📦 Payload (byte count: $(wc -c < ping-body.json)):"
-          cat ping-body.json
-          
-          # 3) Send the request, capturing both headers and body for debug
-          RESPONSE=$(curl --silent --show-error -i -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
+
+          # Send the request
+          RESPONSE=$(curl --silent --show-error -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
             --data-binary @ping-body.json)
-          
-          # 4) Output full response (status line + headers + body)
-          echo "📬 Full response:"
-          echo "$RESPONSE"
-          
-          # 5) Extract just the JSON body for assertion
-          BODY=$(printf "%s" "$RESPONSE" | sed -n '/^\r$/,$p' | tr -d '\r')
-          echo "🔍 Response body only: $BODY"
-          
-          # 6) Check for our keepalive marker
-          if [[ "$BODY" != *'"status":"awake"'* ]]; then
-            echo "❌ Unexpected response — failing job"
+
+          echo "Ping response: $RESPONSE"
+          if [[ "$RESPONSE" != *'"status":"awake"'* ]]; then
+            echo "❌ Keepalive failed"
             exit 1
           fi
-          echo "✅ Keepalive successful!"
+          echo "✅ Keepalive succeeded"
