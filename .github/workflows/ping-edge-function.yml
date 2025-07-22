@@ -10,7 +10,7 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-            - name: Clean Ping to create-checkout function via inline JSON
+      - name: Clean Ping to create-checkout function via inline JSON
         env:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
