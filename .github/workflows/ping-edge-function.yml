@@ -16,22 +16,31 @@ jobs:
         run: |
           echo "🟡 Starting keepalive ping at $(date -u)"
           
-          # Write the payload exactly (no stray newline or escapes)
+          # 1) Write the exact JSON payload (no trailing newline)
           printf '{"item":"ping","amount":0.01}' > ping-body.json
           
-          # DEBUG: Show in logs exactly what we're sending
-          echo "📦 Payload:"
+          # 2) DEBUG: show payload bytes & length
+          echo "📦 Payload (byte count: $(wc -c < ping-body.json)):"
           cat ping-body.json
           
-          # Curl with file-based JSON
-          RESPONSE=$(curl --silent --show-error -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
+          # 3) Send the request, capturing both headers and body for debug
+          RESPONSE=$(curl --silent --show-error -i -X POST https://vwpgkjnncxhklcrqymyr.supabase.co/functions/v1/create-checkout \
             -H "Content-Type: application/json" \
             -H "Origin: https://www.huddlestoncogop.org" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            -d @ping-body.json)
+            --data-binary @ping-body.json)
           
-          echo "✅ Ping response: $RESPONSE"
-          if [[ "$RESPONSE" != *"\"status\":\"awake\""* ]]; then
+          # 4) Output full response (status line + headers + body)
+          echo "📬 Full response:"
+          echo "$RESPONSE"
+          
+          # 5) Extract just the JSON body for assertion
+          BODY=$(printf "%s" "$RESPONSE" | sed -n '/^\r$/,$p' | tr -d '\r')
+          echo "🔍 Response body only: $BODY"
+          
+          # 6) Check for our keepalive marker
+          if [[ "$BODY" != *'"status":"awake"'* ]]; then
             echo "❌ Unexpected response — failing job"
             exit 1
           fi
+          echo "✅ Keepalive successful!"
